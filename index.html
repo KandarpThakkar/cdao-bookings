@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KTC · CDAO Mastery Bookings</title>
+<script>
+const CONFIG = {
+  clientId: "836c252d-1301-43c5-b751-12f95baaeebb",
+  tenantId: "4d2d7cd3-9a15-4327-a7db-69a0b5a3ca7d",
+  driveId:  "b!xc1KNjMK30y5yOt22qAnu1p7Jarzp8xKj60yFguhvaT1nGcHLxUNQqHNRQjHFtSI",
+  itemId:   "01HQQMDMXAQINVAHSJV5DLRLTPP7UGNJTV",
+  // No client secret — uses your Microsoft login credentials directly (delegated auth)
+};
+</script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#f8f7f4;color:#1a1a1a;font-size:14px}
+:root{--navy:#1B3A6B;--teal:#00897B;--gold:#C9A84C;--light:#EAF0F8;--surface:#fff;--border:#e2e0da;--muted:#6b7280;
+--s-bg:#C8E6C9;--s-t:#1B5E20;--w-bg:#FFF9C4;--w-t:#E65100;--d-bg:#FFCDD2;--d-t:#B71C1C;--i-bg:#E3F2FD;--i-t:#0D47A1}
+.auth-screen{display:flex;align-items:center;justify-content:center;height:100vh;background:var(--navy)}
+.auth-card{background:#fff;border-radius:20px;padding:48px 40px;text-align:center;max-width:400px;width:100%}
+.auth-logo{font-size:32px;font-weight:800;color:var(--navy);letter-spacing:-1px}
+.auth-sub{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-top:4px}
+.auth-bar{width:40px;height:4px;background:var(--gold);border-radius:2px;margin:16px auto}
+.auth-title{font-size:18px;font-weight:600;color:var(--navy);margin:24px 0 8px}
+.auth-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:28px}
+.auth-btn{display:inline-flex;align-items:center;gap:10px;background:var(--navy);color:#fff;border:none;border-radius:10px;padding:14px 28px;font-size:14px;font-weight:600;cursor:pointer;width:100%;justify-content:center;font-family:inherit;transition:background .15s}
+.auth-btn:hover{background:#152e56}
+.auth-btn svg{width:20px;height:20px;fill:#fff;flex-shrink:0}
+.auth-note{font-size:11px;color:var(--muted);margin-top:16px;line-height:1.5}
+.auth-error{background:#FFEBEE;color:#B71C1C;border-radius:8px;padding:10px 14px;font-size:12px;margin-top:14px;display:none;text-align:left}
+.app{display:none;height:100vh;overflow:hidden}
+.app.visible{display:flex}
+.sb{width:224px;background:var(--navy);display:flex;flex-direction:column;flex-shrink:0}
+.sb-logo{padding:20px 16px 14px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sb-brand{font-size:20px;font-weight:700;color:#fff;letter-spacing:-.5px}
+.sb-sub{font-size:10px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:1.5px;margin-top:2px}
+.sb-bar{width:32px;height:3px;background:var(--gold);border-radius:2px;margin-top:10px}
+.sb-user{padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.08);font-size:11px;color:rgba(255,255,255,.4)}
+.sb-user strong{color:rgba(255,255,255,.75);display:block;font-size:12px;margin-top:2px}
+.sb-nav{flex:1;padding:10px 8px;overflow-y:auto}
+.sb-nav::-webkit-scrollbar{width:3px}
+.sb-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:2px}
+.ns{font-size:9px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:1.5px;padding:12px 8px 5px}
+.ni{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;color:rgba(255,255,255,.7);font-size:13px;margin-bottom:2px;transition:all .15s}
+.ni:hover{background:rgba(255,255,255,.08);color:#fff}
+.ni.active{background:rgba(255,255,255,.14);color:#fff}
+.ndot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.nbadge{margin-left:auto;background:var(--gold);color:var(--navy);font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px}
+.npbadge{margin-left:auto;background:#E65100;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px}
+.ncount{margin-left:auto;font-size:10px;color:rgba(255,255,255,.3)}
+.sb-footer{padding:12px 16px;border-top:1px solid rgba(255,255,255,.08)}
+.so-btn{background:none;border:1px solid rgba(255,255,255,.2);border-radius:8px;color:rgba(255,255,255,.6);padding:7px 12px;font-size:12px;cursor:pointer;width:100%;font-family:inherit;transition:all .15s}
+.so-btn:hover{background:rgba(255,255,255,.08);color:#fff}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 22px;display:flex;align-items:center;gap:12px}
+.tb-title{font-size:16px;font-weight:600;color:var(--navy);flex:1}
+.tb-sub{font-size:12px;color:var(--muted)}
+.sync-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--teal);margin-right:5px;animation:pulse 2.5s infinite}
+.sync-dot.busy{background:var(--gold);animation:spin .8s linear infinite}
+.sync-dot.err{background:#e53935;animation:none}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.content{flex:1;overflow-y:auto;padding:22px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s;font-family:inherit}
+.btn-primary{background:var(--navy);color:#fff}.btn-primary:hover{background:#152e56}
+.btn-teal{background:var(--teal);color:#fff}.btn-teal:hover{background:#00796b}
+.btn-ghost{background:transparent;color:var(--navy);border:1px solid var(--border)}.btn-ghost:hover{background:var(--light)}
+.btn-danger{background:#c62828;color:#fff}.btn-danger:hover{background:#b71c1c}
+.btn-sm{padding:5px 10px;font-size:12px}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.metrics.three{grid-template-columns:repeat(3,1fr)}
+.mc{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px}
+.mc.navy{border-top:3px solid var(--navy)}.mc.teal{border-top:3px solid var(--teal)}
+.mc.gold{border-top:3px solid var(--gold)}.mc.danger{border-top:3px solid #e53935}
+.ml{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px}
+.mv{font-size:26px;font-weight:700;line-height:1}
+.ms2{font-size:11px;color:var(--muted);margin-top:4px}
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px}
+.cc{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px}
+.ct{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:12px}
+.br{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.bl{font-size:11px;color:var(--muted);width:100px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
+.bt{flex:1;height:18px;background:var(--light);border-radius:4px;overflow:hidden}
+.bf{height:100%;border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:5px;transition:width .4s}
+.bv{font-size:10px;color:#fff;font-weight:700}
+.bo{font-size:11px;color:var(--muted);min-width:18px}
+.divider{height:1px;background:var(--border);margin:14px 0}
+.fb{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:18px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.fb input,.fb select{border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:13px;color:#1a1a1a;background:#fff;outline:none;font-family:inherit}
+.fb input:focus,.fb select:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,137,123,.1)}
+.fb input{flex:1;min-width:160px}
+.pending-banner{background:var(--w-bg);border:1px solid #f0c040;border-radius:10px;padding:12px 16px;margin-bottom:18px;display:flex;align-items:center;gap:12px}
+.pending-banner .pb-text{flex:1;font-size:13px;color:var(--w-t);font-weight:500}
+.tw{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.th-bar{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid var(--border)}
+.tt{font-size:14px;font-weight:600;color:var(--navy)}
+.tc{font-size:12px;color:var(--muted);margin-left:8px}
+.tscroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#f8f7f4;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.5px;font-weight:600;padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none}
+th:hover{color:var(--navy)}
+td{padding:10px 12px;border-bottom:1px solid #f0ede8;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafaf8}
+tr.pr td{background:#fffef0}
+tr.pr:hover td{background:#fffde0}
+.cn{font-weight:500;color:var(--navy)}.ce{color:var(--muted);font-size:11px}.co{font-size:12px}
+.badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.b-paid{background:var(--s-bg);color:var(--s-t)}.b-chase{background:var(--d-bg);color:var(--d-t)}
+.b-warn{background:var(--w-bg);color:var(--w-t)}.b-info{background:var(--i-bg);color:var(--i-t)}
+.b-neutral{background:#f3f4f6;color:#374151}
+.b-pending{background:#FFF3E0;color:#E65100;border:1px solid #FFB74D}
+.b-cpd-y{background:var(--s-bg);color:var(--s-t)}.b-cpd-n{background:var(--d-bg);color:var(--d-t)}
+.cpill{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600}
+.ra{display:flex;gap:3px;opacity:0;transition:opacity .15s}
+tr:hover .ra{opacity:1}
+.ib{background:none;border:none;cursor:pointer;padding:4px 5px;border-radius:6px;color:var(--muted);font-size:13px;transition:all .15s;font-family:inherit}
+.ib:hover{background:var(--light);color:var(--navy)}
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px}
+.md{background:var(--surface);border-radius:16px;width:100%;max-width:600px;max-height:90vh;overflow-y:auto}
+.mh{padding:20px 22px 16px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;position:sticky;top:0;background:var(--surface);z-index:2}
+.mt2{font-size:16px;font-weight:700;color:var(--navy)}
+.ms3{font-size:12px;color:var(--muted);margin-top:2px}
+.mb3{padding:20px 22px}
+.mf{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;background:#fbfaf7;border-radius:0 0 16px 16px}
+.xb{background:none;border:none;cursor:pointer;font-size:22px;color:var(--muted);line-height:1;padding:0}
+.xb:hover{color:#1a1a1a}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fgp{display:flex;flex-direction:column;gap:4px}
+.fgp.full{grid-column:1/-1}
+.fl2{font-size:12px;font-weight:600;color:var(--navy)}
+.fl2 span{color:#e53935}
+.fi,.fs2{border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:13px;color:#1a1a1a;background:#fff;outline:none;width:100%;font-family:inherit}
+.fi:focus,.fs2:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,137,123,.1)}
+.fsec{font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:1px;padding:12px 0 6px;border-bottom:1px solid var(--border);margin-bottom:12px;grid-column:1/-1}
+.fnote{font-size:11px;color:#5D4037;grid-column:1/-1;background:#FFF8E1;border-radius:8px;padding:8px 12px;line-height:1.5;border:1px solid #FFB74D}
+.av{border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
+.pag{display:flex;align-items:center;gap:6px;padding:11px 14px;border-top:1px solid var(--border)}
+.pb2{padding:4px 9px;border:1px solid var(--border);border-radius:6px;background:#fff;cursor:pointer;font-size:12px;font-family:inherit}
+.pb2.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.pi{font-size:12px;color:var(--muted);flex:1}
+.toast{position:fixed;bottom:22px;right:22px;color:#fff;padding:11px 16px;border-radius:10px;font-size:13px;z-index:9999;animation:su .25s ease;background:#1a1a1a}
+.toast.ok{background:#1B5E20}.toast.err2{background:#B71C1C}
+@keyframes su{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.empty{text-align:center;padding:40px;color:var(--muted)}
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;color:var(--muted);gap:12px}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--teal);border-radius:50%;animation:spin .7s linear infinite}
+.chdr{padding:13px 16px;background:var(--light);display:flex;align-items:center;justify-content:space-between}
+.ch-title{font-size:14px;font-weight:700;color:var(--navy)}
+</style>
+</head>
+<body>
+
+<div class="auth-screen" id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo">KTC</div>
+    <div class="auth-sub">Kandarp Thakkar Consulting</div>
+    <div class="auth-bar"></div>
+    <div class="auth-title">CDAO Mastery · Booking System</div>
+    <div class="auth-desc">Sign in with your Microsoft 365 account to access the booking database. Your data is stored securely in your OneDrive.</div>
+    <button class="auth-btn" onclick="signIn()">
+      <svg viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="1" width="9" height="9"/><rect x="11" y="1" width="9" height="9"/><rect x="1" y="11" width="9" height="9"/><rect x="11" y="11" width="9" height="9"/></svg>
+      Sign in with Microsoft
+    </button>
+    <div class="auth-note">Only accounts from kandarpthakkarconsulting.com can access this system</div>
+    <div class="auth-error" id="auth-error"></div>
+  </div>
+</div>
+
+<div class="app" id="app">
+  <div class="sb">
+    <div class="sb-logo">
+      <div class="sb-brand">KTC</div>
+      <div class="sb-sub">CDAO Mastery Course</div>
+      <div class="sb-bar"></div>
+    </div>
+    <div class="sb-user">Signed in as<strong id="user-name">—</strong></div>
+    <div class="sb-nav">
+      <div class="ns">Overview</div>
+      <div class="ni active" id="nav-dashboard" onclick="setView('dashboard')">📊 Dashboard</div>
+      <div class="ni" id="nav-bookings" onclick="setView('bookings')">📋 All Bookings <span class="nbadge" id="total-badge">—</span></div>
+      <div class="ni" id="nav-pending" onclick="setView('pending')" style="display:none">⏳ Pending Review <span class="npbadge" id="pending-badge">0</span></div>
+      <div class="ns">Cohorts</div>
+      <div id="cohort-nav"></div>
+      <div class="ns">Actions</div>
+      <div class="ni" onclick="openAdd()">➕ New Booking</div>
+      <div class="ni" onclick="openAddCohort()">📅 Add Cohort</div>
+      <div class="ni" onclick="doExport()">⬇ Export CSV</div>
+      <div class="ni" onclick="loadData()">↻ Refresh</div>
+    </div>
+    <div class="sb-footer">
+      <button class="so-btn" onclick="signOut()">Sign out</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <div class="tb-title" id="topbar-title">Loading…</div>
+        <div class="tb-sub"><span class="sync-dot" id="sync-dot"></span><span id="sync-status">Connecting…</span></div>
+      </div>
+      <button class="btn btn-teal" onclick="openAdd()">+ New Booking</button>
+    </div>
+    <div class="content" id="content">
+      <div class="loading"><div class="spinner"></div>Connecting to your OneDrive…</div>
+    </div>
+  </div>
+</div>
+
+<div id="modals"></div>
+<div id="toasts"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.10.0/lib/msal-browser.min.js"></script>
+<script>
+// ── MSAL CONFIG — delegated auth only, no client secret ───────────────────────
+const msalConfig = {
+  auth: {
+    clientId: CONFIG.clientId,
+    authority: `https://login.microsoftonline.com/${CONFIG.tenantId}`,
+    redirectUri: window.location.origin + window.location.pathname,
+  },
+  cache: { cacheLocation: "localStorage", storeAuthStateInCookie: true }
+};
+
+const msal_app = new msal.PublicClientApplication(msalConfig);
+const SCOPES = ["Files.ReadWrite", "User.Read"];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+const TABS=["1B3A6B","00897B","C9A84C","5C6BC0","EF5350","26A69A","AB47BC","FFA726","42A5F5","66BB6A","EC407A","8D6E63"];
+let currentUser = null;
+let delegates = [], cohorts = [];
+let curView = 'dashboard';
+let fSrch = '', fCohort = 'all', fPay = 'all';
+let sortF = 'l', sortD = 1, pg = 1;
+const PG = 20;
+const DB_SHEET = "AppDatabase";
+const COHORT_SHEET = "CohortList";
+const HEADERS = [["ID","First Name","Last Name","Email","Job Title","Organisation","Cohort","Payment Method","Special Pricing","Invoice/Link Sent","Payment Status","CPD Certificate","Status","Added By","Added At"]];
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+async function init() {
+  await msal_app.initialize();
+  try {
+    const resp = await msal_app.handleRedirectPromise();
+    if (resp && resp.account) {
+      msal_app.setActiveAccount(resp.account);
+      currentUser = resp.account;
+      showApp();
+      return;
+    }
+  } catch(e) { showAuthError(e.message); return; }
+
+  const accounts = msal_app.getAllAccounts();
+  if (accounts.length > 0) {
+    msal_app.setActiveAccount(accounts[0]);
+    currentUser = accounts[0];
+    try {
+      await getToken(); // validate token still works
+      showApp();
+    } catch(e) { showAuthScreen(); }
+  } else {
+    showAuthScreen();
+  }
+}
+
+function showAuthScreen() {
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('app').classList.remove('visible');
+}
+
+function showAuthError(msg) {
+  const el = document.getElementById('auth-error');
+  el.style.display = 'block';
+  el.textContent = 'Sign-in error: ' + msg;
+}
+
+function showApp() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app').classList.add('visible');
+  document.getElementById('user-name').textContent =
+    currentUser?.name || currentUser?.username || 'User';
+  loadData();
+}
+
+async function signIn() {
+  try {
+    await msal_app.loginRedirect({ scopes: SCOPES });
+  } catch(e) { showAuthError(e.message); }
+}
+
+function signOut() {
+  msal_app.logoutRedirect({ postLogoutRedirectUri: window.location.href });
+}
+
+async function getToken() {
+  const account = msal_app.getActiveAccount();
+  try {
+    const r = await msal_app.acquireTokenSilent({ scopes: SCOPES, account });
+    return r.accessToken;
+  } catch(e) {
+    const r = await msal_app.acquireTokenPopup({ scopes: SCOPES, account });
+    return r.accessToken;
+  }
+}
+
+// ── GRAPH HELPERS ─────────────────────────────────────────────────────────────
+// Use the signed-in user's own OneDrive path — avoids 403 permission issues
+const FILE_PATH = "Kandarp Thakkar Consulting LTD/Training Courses/CDAO Mastery/Bookings Master Database/CDAO_Mastery_Bookings_Enhanced.xlsx";
+const BASE = `https://graph.microsoft.com/v1.0/me/drive/root:/${encodeURIComponent(FILE_PATH).replace(/%2F/g,'/')}:`;
+
+async function gGet(url) {
+  const t = await getToken();
+  const r = await fetch(url, { headers: { Authorization: `Bearer ${t}` } });
+  if (!r.ok) { const e = await r.text(); throw new Error(`${r.status}: ${e}`); }
+  return r.json();
+}
+
+async function gPatch(url, body) {
+  const t = await getToken();
+  const r = await fetch(url, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${t}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) { const e = await r.text(); throw new Error(`${r.status}: ${e}`); }
+  return r.json();
+}
+
+async function gPost(url, body) {
+  const t = await getToken();
+  const r = await fetch(url, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${t}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) { const e = await r.text(); throw new Error(`${r.status}: ${e}`); }
+  return r.json();
+}
+
+// ── EXCEL OPS ─────────────────────────────────────────────────────────────────
+async function getSheetNames() {
+  const d = await gGet(`${BASE}/workbook/worksheets`);
+  return d.value.map(s => s.name);
+}
+
+async function createSheet(name) {
+  await gPost(`${BASE}/workbook/worksheets`, { name });
+}
+
+async function writeRange(sheet, range, values) {
+  const url = `${BASE}/workbook/worksheets('${sheet}')/range(address='${range}')`;
+  await gPatch(url, { values });
+}
+
+async function readUsedRange(sheet) {
+  const url = `${BASE}/workbook/worksheets('${sheet}')/usedRange`;
+  const d = await gGet(url);
+  return d.values || [];
+}
+
+// ── LOAD DATA ─────────────────────────────────────────────────────────────────
+async function loadData() {
+  setSyncing(true); setStatus('Syncing with OneDrive…');
+  try {
+    const names = await getSheetNames();
+
+    // Create AppDatabase sheet if missing
+    if (!names.includes(DB_SHEET)) {
+      await createSheet(DB_SHEET);
+      await writeRange(DB_SHEET, 'A1:O1', HEADERS);
+      toast('Database sheet created in your Excel file ✓', 'ok');
+    }
+
+    // Create CohortList sheet if missing
+    if (!names.includes(COHORT_SHEET)) {
+      await createSheet(COHORT_SHEET);
+      const defaults = [
+        ["26.11.24","Nov 2024"],["28.01.25","Jan 2025"],["18.03.25","Mar 2025"],
+        ["13.05.25","May 2025"],["22.07.25","Jul 2025"],["14.10.25","Oct 2025"],
+        ["20.01.26","Jan 2026"],["23.04.26","Apr 2026"],["14.07.26","Jul 2026"],
+        ["20.10.26","Oct 2026"],["26.01.27","Jan 2027"],["Wtg List","Waiting List"]
+      ];
+      await writeRange(COHORT_SHEET, `A1:B${defaults.length}`, defaults);
+    }
+
+    // Convert Excel date serials (e.g. 45597) to DD.MM.YY text
+    // Excel serial 1 = 1 Jan 1900 (with MS leap-year bug offset of -1 day)
+    function fixDate(val) {
+      if (!val && val !== 0) return '';
+      const s = String(val).trim();
+      if (!s || s === 'null' || s === 'undefined') return '';
+      // Already a text date — return as-is
+      if (s.includes('.') || s.includes('/') || !/^\d+$/.test(s)) return s;
+      const n = parseInt(s);
+      // Only treat plausible Excel date serials (year ~2000-2050 range)
+      if (n < 36526 || n > 73050) return s;
+      const d = new Date(Date.UTC(1899, 11, 30) + n * 86400000);
+      const dd = String(d.getUTCDate()).padStart(2,'0');
+      const mm = String(d.getUTCMonth()+1).padStart(2,'0');
+      const yy = String(d.getUTCFullYear()).slice(2);
+      return `${dd}.${mm}.${yy}`;
+    }
+    function fixLabel(val) {
+      if (!val && val !== 0) return '';
+      const s = String(val).trim();
+      if (!s || !/^\d+$/.test(s)) return s;
+      const n = parseInt(s);
+      if (n < 36526 || n > 73050) return s;
+      const d = new Date(Date.UTC(1899, 11, 30) + n * 86400000);
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      return `${months[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+    }
+
+    // Read cohorts — fix any serial dates
+    const cRows = await readUsedRange(COHORT_SHEET);
+    cohorts = cRows.filter(r => r[0] && r[1]).map(r => ({
+      date: fixDate(r[0]),
+      label: fixLabel(r[1]) || String(r[1])
+    }));
+
+    // Read delegates — fix cohort column serial dates
+    const dRows = await readUsedRange(DB_SHEET);
+    delegates = dRows.length > 1
+      ? dRows.slice(1).filter(r => r[0] && String(r[0]).trim()).map(r => ({
+          id:String(r[0]||''), f:String(r[1]||''), l:String(r[2]||''),
+          e:String(r[3]||''), t:String(r[4]||''), o:String(r[5]||''),
+          c:fixDate(r[6]), m:String(r[7]||''), sp:String(r[8]||''),
+          is:String(r[9]||''), ps:String(r[10]||''), cpd:String(r[11]||''),
+          status:String(r[12]||'confirmed'), addedBy:String(r[13]||''), addedAt:String(r[14]||'')
+        }))
+      : [];
+
+    buildNav(); updateBadges(); setStatus('Connected · OneDrive'); setSyncing(false);
+    render();
+  } catch(e) {
+    console.error(e);
+    setStatus('Sync error — check connection');
+    setSyncing(false, true);
+    toast('Could not load data: ' + e.message, 'err2');
+  }
+}
+
+// ── SAVE / DELETE ─────────────────────────────────────────────────────────────
+async function saveDelegate(d, isNew) {
+  setSyncing(true); setStatus('Saving to OneDrive…');
+  try {
+    const now = new Date().toLocaleDateString('en-GB');
+    const by = currentUser?.name || currentUser?.username || '';
+    const rows = await readUsedRange(DB_SHEET);
+
+    if (isNew) {
+      d.id = 'D' + Date.now();
+      d.addedBy = d.addedBy || by;
+      d.addedAt = d.addedAt || now;
+      d.status = d.status || 'confirmed';
+      const rowNum = rows.length + 1;
+      await writeRange(DB_SHEET, `A${rowNum}:O${rowNum}`,
+        [[d.id,d.f,d.l,d.e,d.t,d.o,d.c,d.m,d.sp,d.is,d.ps,d.cpd,d.status,d.addedBy,d.addedAt]]);
+      delegates.push(d);
+    } else {
+      const idx = rows.findIndex(r => String(r[0]) === String(d.id));
+      if (idx < 0) throw new Error('Row not found in sheet');
+      await writeRange(DB_SHEET, `A${idx+1}:O${idx+1}`,
+        [[d.id,d.f,d.l,d.e,d.t,d.o,d.c,d.m,d.sp,d.is,d.ps,d.cpd,d.status||'confirmed',d.addedBy||by,d.addedAt||now]]);
+      const li = delegates.findIndex(x => x.id === d.id);
+      if (li >= 0) delegates[li] = d;
+    }
+
+    buildNav(); updateBadges(); setStatus('Saved · OneDrive'); setSyncing(false);
+  } catch(e) {
+    setStatus('Save failed'); setSyncing(false, true);
+    toast('Save failed: ' + e.message, 'err2'); throw e;
+  }
+}
+
+async function deleteDelegate(id) {
+  setSyncing(true); setStatus('Deleting…');
+  try {
+    const rows = await readUsedRange(DB_SHEET);
+    const idx = rows.findIndex(r => String(r[0]) === String(id));
+    if (idx >= 0) {
+      await writeRange(DB_SHEET, `A${idx+1}:O${idx+1}`,
+        [['','','','','','','','','','','','','','','']]);
+    }
+    delegates = delegates.filter(d => d.id !== id);
+    buildNav(); updateBadges(); setStatus('Deleted · OneDrive'); setSyncing(false);
+  } catch(e) {
+    setSyncing(false, true); toast('Delete failed: ' + e.message, 'err2');
+  }
+}
+
+async function addCohortToSheet(date, label) {
+  const rows = await readUsedRange(COHORT_SHEET);
+  await writeRange(COHORT_SHEET, `A${rows.length+1}:B${rows.length+1}`, [[date, label]]);
+  cohorts.push({ date, label });
+}
+
+// ── UI HELPERS ────────────────────────────────────────────────────────────────
+function setSyncing(on, err=false) {
+  const d = document.getElementById('sync-dot');
+  if (d) d.className = 'sync-dot' + (on?' busy':err?' err':'');
+}
+function setStatus(m) { const e=document.getElementById('sync-status'); if(e) e.textContent=m; }
+function updateBadges() {
+  document.getElementById('total-badge').textContent = delegates.filter(d=>d.status!=='pending').length;
+  const p = delegates.filter(d=>d.status==='pending').length;
+  const pn = document.getElementById('nav-pending');
+  const pb = document.getElementById('pending-badge');
+  if (p>0) { pn.style.display='flex'; pb.textContent=p; } else { pn.style.display='none'; }
+}
+const ini = r => ((r.f||'?')[0]+(r.l||'?')[0]).toUpperCase();
+const clbl = d => { const f=cohorts.find(c=>c.date===d); if(f) return f.label; const s=String(d||"").trim(); if(!/^\d+$/.test(s)) return s; const n=parseInt(s); if(n<36526||n>73050) return s; const dt=new Date(Date.UTC(1899,11,30)+n*86400000); const cv=`${String(dt.getUTCDate()).padStart(2,"0")}.${String(dt.getUTCMonth()+1).padStart(2,"0")}.${String(dt.getUTCFullYear()).slice(2)}`; const f2=cohorts.find(c=>c.date===cv); return f2?f2.label:cv; };
+const tcol = i => '#'+TABS[Math.abs(i)%TABS.length];
+function payBadge(p) {
+  if (!p) return '<span class="badge b-neutral">—</span>';
+  const pl=(p||'').toLowerCase();
+  if(pl.includes('paid')) return `<span class="badge b-paid">✓ Paid</span>`;
+  if(pl.includes('chasing')||pl.includes('contacted')) return `<span class="badge b-chase">⚠ ${p}</span>`;
+  if(pl.includes('invoice')||pl.includes('pwds')) return `<span class="badge b-warn">${p}</span>`;
+  return `<span class="badge b-neutral">${p}</span>`;
+}
+function cpdBadge(v) {
+  if((v||'').toLowerCase()==='yes') return '<span class="badge b-cpd-y">✓ Yes</span>';
+  if((v||'').toLowerCase()==='no') return '<span class="badge b-cpd-n">✗ No</span>';
+  return '<span class="badge b-neutral">—</span>';
+}
+
+// ── NAV ───────────────────────────────────────────────────────────────────────
+function buildNav() {
+  document.getElementById('cohort-nav').innerHTML = cohorts.map((c,i) => `
+    <div class="ni" id="nav-c-${c.date.replace(/[.\s]/g,'_')}" onclick="setView('cohort::${c.date}')">
+      <span class="ndot" style="background:${tcol(i)}"></span>
+      <span style="font-size:12px">${c.label}</span>
+      <span class="ncount">${delegates.filter(d=>d.c===c.date&&d.status!=='pending').length||''}</span>
+    </div>`).join('');
+}
+function setView(v) {
+  curView=v; pg=1;
+  document.querySelectorAll('.ni').forEach(e=>e.classList.remove('active'));
+  const nid = v.startsWith('cohort::') ? 'nav-c-'+v.replace('cohort::','').replace(/[.\s]/g,'_') : 'nav-'+v;
+  const el = document.getElementById(nid); if(el) el.classList.add('active');
+  render();
+}
+function render() {
+  if(curView==='dashboard') renderDash();
+  else if(curView==='bookings') renderBookings();
+  else if(curView==='pending') renderPending();
+  else if(curView.startsWith('cohort::')) renderCohort(curView.replace('cohort::',''));
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+function renderDash() {
+  document.getElementById('topbar-title').textContent='Dashboard';
+  const conf = delegates.filter(d=>d.status!=='pending');
+  const total=conf.length, paid=conf.filter(d=>(d.ps||'').toLowerCase().includes('paid')).length;
+  const cpd=conf.filter(d=>(d.cpd||'').toLowerCase()==='yes').length;
+  const noRec=conf.filter(d=>!d.ps&&d.c!=='Wtg List').length;
+  const pend=delegates.filter(d=>d.status==='pending').length;
+  const maxC=Math.max(...cohorts.map(c=>conf.filter(d=>d.c===c.date).length),1);
+  const nhs=conf.filter(d=>d.e&&(d.e.includes('nhs.')||d.e.includes('nbt.')||d.e.includes('uhbw.'))).length;
+  const hospice=conf.filter(d=>(d.o||'').toLowerCase().includes('hospice')).length;
+  document.getElementById('content').innerHTML=`
+    ${pend>0?`<div class="pending-banner"><span style="font-size:20px">⏳</span>
+      <div class="pb-text">${pend} website enquir${pend===1?'y':'ies'} waiting for your review</div>
+      <button class="btn btn-sm" style="background:#E65100;color:#fff" onclick="setView('pending')">Review now →</button>
+    </div>`:''}
+    <div class="metrics">
+      <div class="mc navy"><div class="ml">Confirmed Delegates</div><div class="mv" style="color:var(--navy)">${total}</div><div class="ms2">${cohorts.filter(c=>conf.find(d=>d.c===c.date)).length} active cohorts</div></div>
+      <div class="mc teal"><div class="ml">Confirmed Paid</div><div class="mv" style="color:var(--teal)">${paid}</div><div class="ms2">${total?Math.round(paid/total*100):0}% rate</div></div>
+      <div class="mc gold"><div class="ml">CPD Sent</div><div class="mv" style="color:var(--gold)">${cpd}</div><div class="ms2">${total-cpd} still to send</div></div>
+      <div class="mc danger"><div class="ml">No Payment Recorded</div><div class="mv" style="color:#e53935">${noRec}</div><div class="ms2">Needs action</div></div>
+    </div>
+    <div class="chart-row">
+      <div class="cc"><div class="ct">Delegates per cohort</div>
+        ${cohorts.map((c,i)=>{const n=conf.filter(d=>d.c===c.date).length;if(!n)return'';
+          return`<div class="br"><div class="bl">${c.label}</div><div class="bt"><div class="bf" style="width:${Math.round(n/maxC*100)}%;background:${tcol(i)}">${n>0?`<span class="bv">${n}</span>`:''}</div></div></div>`;}).join('')}
+      </div>
+      <div class="cc"><div class="ct">Payment status</div>
+        ${[{l:'Paid',v:paid,c:'#00897B'},{l:'Chasing/Contacted',v:conf.filter(d=>{const p=(d.ps||'').toLowerCase();return p.includes('chasing')||p.includes('contacted')}).length,c:'#e53935'},
+           {l:'To be invoiced',v:conf.filter(d=>{const p=(d.ps||'').toLowerCase();return p.includes('invoice')||p.includes('pwds')}).length,c:'#C9A84C'},
+           {l:'No record',v:noRec,c:'#9e9e9e'}].map(s=>`<div class="br"><div class="bl">${s.l}</div><div class="bt"><div class="bf" style="width:${total?Math.round(s.v/total*100):0}%;background:${s.c}">${s.v?`<span class="bv">${s.v}</span>`:''}</div></div><span class="bo">${s.v}</span></div>`).join('')}
+        <div class="divider"></div><div class="ct">Sector</div>
+        ${[{l:'NHS Trusts',v:nhs,c:'#1B3A6B'},{l:'Hospices',v:hospice,c:'#00897B'},{l:'Independent/Other',v:total-nhs-hospice,c:'#C9A84C'}]
+          .map(s=>`<div class="br"><div class="bl">${s.l}</div><div class="bt"><div class="bf" style="width:${total?Math.round(s.v/total*100):0}%;background:${s.c}">${s.v?`<span class="bv">${s.v}</span>`:''}</div></div></div>`).join('')}
+      </div>
+    </div>
+    <div class="tw">
+      <div class="th-bar"><span class="tt">Cohort overview</span><button class="btn btn-ghost btn-sm" onclick="setView('bookings')">All bookings →</button></div>
+      <table><thead><tr><th>Cohort</th><th>Delegates</th><th>Paid</th><th>CPD Sent</th><th>Outstanding</th><th></th></tr></thead><tbody>
+      ${cohorts.map((c,i)=>{
+        const rows=conf.filter(d=>d.c===c.date);
+        const p=rows.filter(d=>(d.ps||'').toLowerCase().includes('paid')).length;
+        const cd=rows.filter(d=>(d.cpd||'').toLowerCase()==='yes').length;
+        const out=rows.filter(d=>!d.ps&&c.date!=='Wtg List').length;
+        return`<tr><td><span class="cpill" style="background:${tcol(i)}22;color:${tcol(i)}">${c.label}</span></td>
+          <td><strong>${rows.length}</strong></td>
+          <td>${rows.length?`<span class="badge ${p===rows.length?'b-paid':'b-neutral'}">${p}/${rows.length}</span>`:'—'}</td>
+          <td>${rows.length?`${cd}/${rows.length}`:'—'}</td>
+          <td>${out>0?`<span class="badge b-chase">${out} missing</span>`:rows.length?'<span class="badge b-paid">All good</span>':'—'}</td>
+          <td><button class="btn btn-ghost btn-sm" onclick="setView('cohort::${c.date}')">View →</button></td></tr>`;
+      }).join('')}
+      </tbody></table>
+    </div>`;
+}
+
+// ── PENDING ───────────────────────────────────────────────────────────────────
+function renderPending() {
+  document.getElementById('topbar-title').textContent='Pending Review';
+  const rows=delegates.filter(d=>d.status==='pending');
+  document.getElementById('content').innerHTML=`
+    <div style="margin-bottom:18px"><p style="font-size:13px;color:var(--muted);line-height:1.6">
+      These enquiries arrived via your website. <strong>Confirm</strong> to add as a real booking, <strong>Edit first</strong> to check details, or <strong>Decline</strong> to remove.</p></div>
+    <div class="tw">
+      <div class="th-bar"><span class="tt">Website Enquiries</span><span class="tc">${rows.length} awaiting review</span></div>
+      ${rows.length===0?'<div class="empty">No pending enquiries — all caught up.</div>':
+      `<div class="tscroll"><table><thead><tr><th>Name</th><th>Organisation</th><th>Email</th><th>Requested Cohort</th><th>Received</th><th>Actions</th></tr></thead><tbody>
+      ${rows.map(r=>`<tr class="pr">
+        <td><div class="cn">${r.f} ${r.l}</div><div class="ce">${r.t||''}</div></td>
+        <td class="co">${r.o||'—'}</td>
+        <td class="ce">${r.e}</td>
+        <td><span class="cpill" style="background:${tcol(cohorts.findIndex(c=>c.date===r.c))}22;color:${tcol(cohorts.findIndex(c=>c.date===r.c))}">${clbl(r.c)}</span></td>
+        <td style="font-size:12px;color:var(--muted)">${r.addedAt||'—'}</td>
+        <td><div style="display:flex;gap:6px">
+          <button class="btn btn-teal btn-sm" onclick="confirmPending('${r.id}')">✓ Confirm</button>
+          <button class="btn btn-ghost btn-sm" onclick="openEdit('${r.id}')">Edit first</button>
+          <button class="btn btn-sm" style="background:#fdecea;color:#c62828;border:1px solid #ffcdd2" onclick="declinePending('${r.id}')">✗ Decline</button>
+        </div></td>
+      </tr>`).join('')}
+      </tbody></table></div>`}
+    </div>`;
+}
+
+async function confirmPending(id) {
+  const d=delegates.find(x=>x.id===id); if(!d) return;
+  d.status='confirmed';
+  try { await saveDelegate(d,false); toast(`✓ ${d.f} ${d.l} confirmed`,'ok'); updateBadges(); render(); } catch(e){}
+}
+async function declinePending(id) {
+  const d=delegates.find(x=>x.id===id); if(!d) return;
+  if(!confirm(`Decline enquiry from ${d.f} ${d.l}?`)) return;
+  try { await deleteDelegate(id); toast('Enquiry declined'); updateBadges(); render(); } catch(e){}
+}
+
+// ── ALL BOOKINGS ──────────────────────────────────────────────────────────────
+function renderBookings() {
+  document.getElementById('topbar-title').textContent='All Bookings';
+  let rows=delegates.filter(d=>d.status!=='pending');
+  if(fSrch){const q=fSrch.toLowerCase();rows=rows.filter(r=>(r.f+' '+r.l+' '+r.e+' '+r.o).toLowerCase().includes(q));}
+  if(fCohort!=='all') rows=rows.filter(r=>r.c===fCohort);
+  if(fPay==='paid') rows=rows.filter(r=>(r.ps||'').toLowerCase().includes('paid'));
+  if(fPay==='unpaid') rows=rows.filter(r=>!(r.ps||'').toLowerCase().includes('paid'));
+  rows.sort((a,b)=>{let av=(a[sortF]||'').toLowerCase(),bv=(b[sortF]||'').toLowerCase();return av<bv?-sortD:av>bv?sortD:0;});
+  const pages=Math.ceil(rows.length/PG)||1; if(pg>pages)pg=1;
+  const pr=rows.slice((pg-1)*PG,pg*PG);
+  document.getElementById('content').innerHTML=`
+    <div class="fb">
+      <input type="text" placeholder="🔍  Search name, email, organisation…" value="${fSrch}" oninput="fSrch=this.value;pg=1;renderBookings()">
+      <select onchange="fCohort=this.value;pg=1;renderBookings()">
+        <option value="all">All Cohorts</option>
+        ${cohorts.map(c=>`<option value="${c.date}" ${fCohort===c.date?'selected':''}>${c.label}</option>`).join('')}
+      </select>
+      <select onchange="fPay=this.value;pg=1;renderBookings()">
+        <option value="all" ${fPay==='all'?'selected':''}>All Payments</option>
+        <option value="paid" ${fPay==='paid'?'selected':''}>Paid only</option>
+        <option value="unpaid" ${fPay==='unpaid'?'selected':''}>Not paid</option>
+      </select>
+      <button class="btn btn-ghost btn-sm" onclick="fSrch='';fCohort='all';fPay='all';pg=1;renderBookings()">Clear</button>
+    </div>
+    <div class="tw">
+      <div class="th-bar"><div><span class="tt">Delegate Register</span><span class="tc">${rows.length} result${rows.length!==1?'s':''}</span></div>
+        <div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm" onclick="doExport()">⬇ Export</button><button class="btn btn-teal btn-sm" onclick="openAdd()">+ Add</button></div></div>
+      <div class="tscroll"><table><thead><tr>
+        <th onclick="srt('l')">Name ${sortF==='l'?(sortD>0?'↑':'↓'):''}</th>
+        <th onclick="srt('o')">Organisation ${sortF==='o'?(sortD>0?'↑':'↓'):''}</th>
+        <th onclick="srt('c')">Cohort ${sortF==='c'?(sortD>0?'↑':'↓'):''}</th>
+        <th>Method</th>
+        <th onclick="srt('ps')">Payment ${sortF==='ps'?(sortD>0?'↑':'↓'):''}</th>
+        <th>CPD</th><th></th>
+      </tr></thead><tbody>
+      ${pr.length===0?`<tr><td colspan="7"><div class="empty">No delegates match your filters</div></td></tr>`
+      :pr.map(r=>`<tr>
+        <td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="width:30px;height:30px;font-size:10px">${ini(r)}</div>
+          <div><div class="cn">${r.f} ${r.l}</div><div class="ce">${r.e}</div></div></div></td>
+        <td><div class="co">${r.o||'—'}</div><div class="ce">${r.t||''}</div></td>
+        <td><span class="cpill" style="background:${tcol(cohorts.findIndex(c=>c.date===r.c))}22;color:${tcol(cohorts.findIndex(c=>c.date===r.c))}">${clbl(r.c)}</span></td>
+        <td><span class="badge b-neutral">${r.m||'—'}</span></td>
+        <td>${payBadge(r.ps)}</td><td>${cpdBadge(r.cpd)}</td>
+        <td><div class="ra">
+          <button class="ib" onclick="openEdit('${r.id}')" title="Edit">✏️</button>
+          <button class="ib" onclick="window.location='mailto:${r.e}'" title="Email">✉️</button>
+          <button class="ib" onclick="confirmDel('${r.id}')" title="Remove" style="color:#e53935">🗑</button>
+        </div></td>
+      </tr>`).join('')}
+      </tbody></table></div>
+      <div class="pag"><span class="pi">Showing ${rows.length?((pg-1)*PG+1):0}–${Math.min(pg*PG,rows.length)} of ${rows.length}</span>
+        ${Array.from({length:pages},(_,i)=>`<button class="pb2 ${i+1===pg?'active':''}" onclick="pg=${i+1};renderBookings()">${i+1}</button>`).join('')}
+      </div>
+    </div>`;
+}
+function srt(f){if(sortF===f)sortD*=-1;else{sortF=f;sortD=1;}renderBookings();}
+
+// ── COHORT VIEW ───────────────────────────────────────────────────────────────
+function renderCohort(date) {
+  const co=cohorts.find(x=>x.date===date)||{label:date};
+  const rows=delegates.filter(d=>d.c===date&&d.status!=='pending');
+  const paid=rows.filter(r=>(r.ps||'').toLowerCase().includes('paid')).length;
+  const cpd=rows.filter(r=>(r.cpd||'').toLowerCase()==='yes').length;
+  document.getElementById('topbar-title').textContent=co.label;
+  document.getElementById('content').innerHTML=`
+    <div class="metrics three">
+      <div class="mc navy"><div class="ml">Delegates</div><div class="mv" style="color:var(--navy)">${rows.length}</div></div>
+      <div class="mc teal"><div class="ml">Paid</div><div class="mv" style="color:var(--teal)">${paid}</div><div class="ms2">${rows.length?Math.round(paid/rows.length*100):0}%</div></div>
+      <div class="mc gold"><div class="ml">CPD Sent</div><div class="mv" style="color:var(--gold)">${cpd}</div><div class="ms2">${rows.length-cpd} outstanding</div></div>
+    </div>
+    <div class="tw">
+      <div class="chdr"><span class="ch-title">${co.label} · ${date}</span>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-ghost btn-sm" onclick="fCohort='${date}';setView('bookings')">Full view</button>
+          <button class="btn btn-teal btn-sm" onclick="openAdd('${date}')">+ Add</button>
+        </div></div>
+      ${rows.length===0?'<div class="empty">No confirmed delegates yet.</div>':
+      `<div class="tscroll"><table><thead><tr><th>Name</th><th>Organisation</th><th>Method</th><th>Special Pricing</th><th>Inv. Sent</th><th>Payment</th><th>CPD</th><th></th></tr></thead><tbody>
+      ${rows.map(r=>`<tr>
+        <td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="width:28px;height:28px;font-size:10px">${ini(r)}</div>
+          <div><div class="cn">${r.f} ${r.l}</div><div class="ce">${r.e}</div></div></div></td>
+        <td><div class="co">${r.o||'—'}</div><div class="ce">${r.t||''}</div></td>
+        <td><span class="badge b-neutral">${r.m||'—'}</span></td>
+        <td>${r.sp&&r.sp!=='No'&&r.sp!=='N/A'?`<span class="badge b-info">${r.sp}</span>`:'<span style="color:#9ca3af;font-size:12px">—</span>'}</td>
+        <td style="font-size:12px">${r.is&&r.is!=='N/A'?r.is:'—'}</td>
+        <td>${payBadge(r.ps)}</td><td>${cpdBadge(r.cpd)}</td>
+        <td><div class="ra">
+          <button class="ib" onclick="openEdit('${r.id}')">✏️</button>
+          <button class="ib" onclick="window.location='mailto:${r.e}'">✉️</button>
+          <button class="ib" onclick="confirmDel('${r.id}')" style="color:#e53935">🗑</button>
+        </div></td>
+      </tr>`).join('')}
+      </tbody></table></div>`}
+    </div>`;
+}
+
+// ── FORM HELPERS ──────────────────────────────────────────────────────────────
+function formHTML(r,pre) {
+  const v=r||{}; const cd=v.c||pre||cohorts[0]?.date;
+  return`<div class="fg">
+    ${v.status==='pending'?`<div class="fnote">⏳ Website enquiry — review details before confirming. Received ${v.addedAt||'recently'}.</div>`:''}
+    <div class="fsec">Personal details</div>
+    <div class="fgp"><label class="fl2">First Name <span>*</span></label><input class="fi" id="ff" value="${v.f||''}"></div>
+    <div class="fgp"><label class="fl2">Last Name <span>*</span></label><input class="fi" id="fl" value="${v.l||''}"></div>
+    <div class="fgp full"><label class="fl2">Email <span>*</span></label><input class="fi" id="fe" type="email" value="${v.e||''}"></div>
+    <div class="fgp"><label class="fl2">Job Title</label><input class="fi" id="ft" value="${v.t||''}"></div>
+    <div class="fgp"><label class="fl2">Organisation</label><input class="fi" id="fo" value="${v.o||''}"></div>
+    <div class="fsec">Booking details</div>
+    <div class="fgp"><label class="fl2">Cohort <span>*</span></label>
+      <select class="fs2" id="fc">${cohorts.map(c=>`<option value="${c.date}" ${cd===c.date?'selected':''}>${c.label}</option>`).join('')}</select></div>
+    <div class="fgp"><label class="fl2">Payment Method</label>
+      <select class="fs2" id="fm">${['Invoice','PWDS','Link','Payment Link','Free','Chased','Other'].map(x=>`<option ${v.m===x?'selected':''}>${x}</option>`).join('')}</select></div>
+    <div class="fgp"><label class="fl2">Special Pricing</label><input class="fi" id="fsp" value="${v.sp||''}" placeholder="e.g. 50% discount, £249"></div>
+    <div class="fgp"><label class="fl2">Invoice / Link Sent</label><input class="fi" id="fis" value="${v.is||''}" placeholder="e.g. 14/05/2025 or N/A"></div>
+    <div class="fgp"><label class="fl2">Payment Status</label>
+      <select class="fs2" id="fps"><option value="" ${!v.ps?'selected':''}>— Not set —</option>
+        ${['Paid','To be invoiced','Chasing','Contacted','PWDS','N/A'].map(x=>`<option ${v.ps===x?'selected':''}>${x}</option>`).join('')}</select></div>
+    <div class="fgp"><label class="fl2">CPD Certificate Sent</label>
+      <select class="fs2" id="fcpd"><option value="" ${!v.cpd?'selected':''}>— Not set —</option>
+        <option value="Yes" ${v.cpd==='Yes'?'selected':''}>Yes</option>
+        <option value="No" ${v.cpd==='No'?'selected':''}>No</option></select></div>
+    <input type="hidden" id="fstatus" value="${v.status||'confirmed'}">
+    <input type="hidden" id="faddedby" value="${v.addedBy||''}">
+    <input type="hidden" id="faddedat" value="${v.addedAt||''}">
+  </div>`;
+}
+function gv() {
+  const g=id=>(document.getElementById(id)?.value||'').trim();
+  return{f:g('ff'),l:g('fl'),e:g('fe'),t:g('ft'),o:g('fo'),c:g('fc'),m:g('fm'),sp:g('fsp'),is:g('fis'),ps:g('fps'),cpd:g('fcpd'),status:g('fstatus'),addedBy:g('faddedby'),addedAt:g('faddedat')};
+}
+
+function openAdd(pre) {
+  document.getElementById('modals').innerHTML=`<div class="mo" onclick="if(event.target===this)closeModal()">
+    <div class="md"><div class="mh"><div><div class="mt2">Add New Delegate</div><div class="ms3">Saved directly to your OneDrive Excel file</div></div><button class="xb" onclick="closeModal()">×</button></div>
+    <div class="mb3">${formHTML(null,pre)}</div>
+    <div class="mf"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" id="save-btn" onclick="doSaveAdd()">Save to OneDrive</button></div>
+    </div></div>`;
+}
+async function doSaveAdd() {
+  const v=gv(); if(!v.f||!v.l||!v.e){toast('⚠ Please fill in name and email');return;}
+  v.status='confirmed';
+  const btn=document.getElementById('save-btn'); btn.disabled=true; btn.textContent='Saving…';
+  try { await saveDelegate(v,true); closeModal(); toast(`✓ ${v.f} ${v.l} saved`,'ok'); render(); }
+  catch(e){ btn.disabled=false; btn.textContent='Save to OneDrive'; }
+}
+
+function openEdit(id) {
+  const r=delegates.find(d=>d.id===id); if(!r) return;
+  const isPending=r.status==='pending';
+  document.getElementById('modals').innerHTML=`<div class="mo" onclick="if(event.target===this)closeModal()">
+    <div class="md"><div class="mh">
+      <div style="display:flex;align-items:center;gap:10px"><div class="av" style="width:38px;height:38px">${ini(r)}</div>
+        <div><div class="mt2">${r.f} ${r.l}</div><div class="ms3">${r.o} · ${clbl(r.c)}</div></div></div>
+      <button class="xb" onclick="closeModal()">×</button></div>
+    <div class="mb3">${formHTML(r)}</div>
+    <div class="mf"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      ${isPending?`<button class="btn btn-teal" id="save-btn" onclick="doSaveEdit('${id}',true)">Save & Confirm</button>`:''}
+      <button class="btn btn-primary" id="save-btn2" onclick="doSaveEdit('${id}',false)">${isPending?'Save without confirming':'Save Changes'}</button>
+    </div></div></div>`;
+}
+async function doSaveEdit(id,andConfirm) {
+  const v=gv(); if(!v.f||!v.l||!v.e){toast('⚠ Please fill in name and email');return;}
+  if(andConfirm) v.status='confirmed';
+  v.id=id;
+  try { await saveDelegate(v,false); closeModal(); toast(`✓ ${v.f} ${v.l} updated`,'ok'); updateBadges(); render(); }
+  catch(e){}
+}
+
+function confirmDel(id) {
+  const r=delegates.find(d=>d.id===id); if(!r) return;
+  document.getElementById('modals').innerHTML=`<div class="mo" onclick="if(event.target===this)closeModal()">
+    <div class="md" style="max-width:420px"><div class="mh"><div class="mt2">Remove Delegate</div><button class="xb" onclick="closeModal()">×</button></div>
+    <div class="mb3"><p style="font-size:14px;line-height:1.6">Remove <strong>${r.f} ${r.l}</strong>? This cannot be undone.</p></div>
+    <div class="mf"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-danger" onclick="doDel('${id}')">Remove</button></div>
+    </div></div>`;
+}
+async function doDel(id) {
+  try { await deleteDelegate(id); closeModal(); toast('Delegate removed'); updateBadges(); render(); } catch(e){}
+}
+
+function openAddCohort() {
+  document.getElementById('modals').innerHTML=`<div class="mo" onclick="if(event.target===this)closeModal()">
+    <div class="md" style="max-width:420px"><div class="mh"><div class="mt2">Add New Cohort Date</div><button class="xb" onclick="closeModal()">×</button></div>
+    <div class="mb3"><div class="fg">
+      <div class="fgp full"><label class="fl2">Date <span>*</span></label><input class="fi" id="nc-d" placeholder="e.g. 20.04.27"></div>
+      <div class="fgp full"><label class="fl2">Label <span>*</span></label><input class="fi" id="nc-l" placeholder="e.g. Apr 2027"></div>
+    </div></div>
+    <div class="mf"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="doAddCohort()">Add Cohort</button></div>
+    </div></div>`;
+}
+async function doAddCohort() {
+  const date=(document.getElementById('nc-d')?.value||'').trim();
+  const label=(document.getElementById('nc-l')?.value||'').trim();
+  if(!date||!label){toast('⚠ Please fill in both fields');return;}
+  if(cohorts.find(c=>c.date===date)){toast('⚠ That date already exists');return;}
+  try { await addCohortToSheet(date,label); buildNav(); closeModal(); toast(`✓ ${label} added`,'ok'); render(); }
+  catch(e){ toast('Failed: '+e.message,'err2'); }
+}
+
+function closeModal(){document.getElementById('modals').innerHTML='';}
+
+// ── EXPORT ────────────────────────────────────────────────────────────────────
+function doExport() {
+  const conf=delegates.filter(d=>d.status!=='pending');
+  const hdr=['First Name','Last Name','Email','Job Title','Organisation','Cohort','Method','Special Pricing','Inv Sent','Payment','CPD'];
+  const rows=conf.map(r=>[r.f,r.l,r.e,r.t,r.o,clbl(r.c),r.m,r.sp,r.is,r.ps,r.cpd].map(v=>`"${(v||'').replace(/"/g,'""')}"`).join(','));
+  const csv=[hdr.join(','),...rows].join('\n');
+  const a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='CDAO_Mastery_Bookings.csv'; a.click(); toast('✓ CSV exported');
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function toast(msg,type='') {
+  const t=document.createElement('div'); t.className='toast'+(type?' '+type:''); t.textContent=msg;
+  document.getElementById('toasts').appendChild(t); setTimeout(()=>t.remove(),3500);
+}
+
+init();
+</script>
+</body>
+</html>
